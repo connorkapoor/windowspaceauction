@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './BidList.module.css';
 
-export default function BidList({ bids }) {
+// Memoize the BidList component to prevent unnecessary re-renders
+const BidList = memo(function BidList({ bids }) {
   const [sortBy, setSortBy] = useState('time-desc');
   const [isLoading, setIsLoading] = useState(false);
   const [lastBidCount, setLastBidCount] = useState(0);
@@ -139,4 +140,6 @@ export default function BidList({ bids }) {
       )}
     </div>
   );
-} 
+});
+
+export default BidList; 

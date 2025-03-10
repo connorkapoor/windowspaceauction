@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'framer-motion';
 import BidForm from '../components/BidForm';
 import BidList from '../components/BidList';
@@ -17,35 +17,103 @@ export default function Home() {
   const [isAuctionEnded, setIsAuctionEnded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [lastRefresh, setLastRefresh] = useState(Date.now());
+  const refreshTimeoutRef = useRef(null);
+  const lastBidCountRef = useRef(0);
 
-  // Load bids and auction settings from API
+  // Memoized function to fetch bids to prevent unnecessary re-renders
+  const fetchBids = useCallback(async (silent = false) => {
+    try {
+      if (!silent) {
+        setIsLoading(true);
+      }
+      
+      // Fetch bids with cache-busting query parameter
+      const bidsResponse = await fetch(`/api/bids?t=${Date.now()}`);
+      if (!bidsResponse.ok) {
+        throw new Error('Failed to fetch bids');
+      }
+      
+      const bidsData = await bidsResponse.json();
+      
+      // Only update state if the bid count has changed
+      if (bidsData.length !== lastBidCountRef.current) {
+        setBids(bidsData);
+        lastBidCountRef.current = bidsData.length;
+      }
+      
+      if (!silent) {
+        setIsLoading(false);
+      }
+      
+      return bidsData;
+    } catch (error) {
+      console.error('Error fetching bids:', error);
+      if (!silent) {
+        setError(error.message);
+        setIsLoading(false);
+      }
+      
+      // Fallback to localStorage if API fails
+      const savedBids = localStorage.getItem('windowAuctionBids');
+      if (savedBids) {
+        const parsedBids = JSON.parse(savedBids);
+        setBids(parsedBids);
+        return parsedBids;
+      }
+      
+      return [];
+    }
+  }, []);
+
+  // Memoized function to fetch auction settings
+  const fetchAuctionSettings = useCallback(async (silent = false) => {
+    try {
+      if (!silent) {
+        setIsLoading(true);
+      }
+      
+      // Fetch auction settings with cache-busting query parameter
+      const settingsResponse = await fetch(`/api/auction?t=${Date.now()}`);
+      if (!settingsResponse.ok) {
+        throw new Error('Failed to fetch auction settings');
+      }
+      
+      const settingsData = await settingsResponse.json();
+      
+      if (!silent) {
+        setIsLoading(false);
+      }
+      
+      return settingsData;
+    } catch (error) {
+      console.error('Error fetching auction settings:', error);
+      if (!silent) {
+        setError(error.message);
+        setIsLoading(false);
+      }
+      
+      return null;
+    }
+  }, []);
+
+  // Load initial data and set up refresh interval
   useEffect(() => {
-    const fetchData = async () => {
+    const loadInitialData = async () => {
       try {
         setIsLoading(true);
         
-        // Fetch bids
-        const bidsResponse = await fetch(`/api/bids?t=${Date.now()}`);
-        if (!bidsResponse.ok) {
-          throw new Error('Failed to fetch bids');
-        }
-        const bidsData = await bidsResponse.json();
-        setBids(bidsData);
+        // Fetch bids and auction settings in parallel
+        const [bidsData, settingsData] = await Promise.all([
+          fetchBids(true),
+          fetchAuctionSettings(true)
+        ]);
         
-        // Fetch auction settings
-        const settingsResponse = await fetch(`/api/auction?t=${Date.now()}`);
-        if (!settingsResponse.ok) {
-          throw new Error('Failed to fetch auction settings');
-        }
-        const settingsData = await settingsResponse.json();
-        
-        if (settingsData.endTime) {
-          // Use the end time from the API
-          const endTime = new Date(settingsData.endTime);
-          
+        // Process auction settings
+        if (settingsData && settingsData.endTime) {
           // Check if auction has already ended
+          const endTime = new Date(settingsData.endTime);
           const now = new Date();
+          
           if (endTime <= now) {
             setIsAuctionEnded(true);
             if (bidsData.length > 0) {
@@ -57,68 +125,39 @@ export default function Home() {
         }
         
         setIsLoading(false);
-        setLastRefresh(Date.now());
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error loading initial data:', error);
         setError(error.message);
         setIsLoading(false);
-        
-        // Fallback to localStorage if API fails
-        const savedBids = localStorage.getItem('windowAuctionBids');
-        if (savedBids) {
-          setBids(JSON.parse(savedBids));
-        }
       }
     };
     
-    fetchData();
+    loadInitialData();
     
-    // Set up a refresh interval to fetch new bids every 10 seconds
+    // Set up a single refresh interval (every 15 seconds)
     const refreshInterval = setInterval(() => {
-      fetchData();
-    }, 10000);
+      // Use silent refresh to avoid showing loading state
+      fetchBids(true);
+    }, 15000);
     
-    return () => clearInterval(refreshInterval);
-  }, []);
-
-  // Refresh bids when a new bid is added
-  useEffect(() => {
-    const refreshBids = async () => {
-      try {
-        // Only refresh if it's been more than 2 seconds since the last refresh
-        // This prevents excessive refreshes when multiple bids are added quickly
-        if (Date.now() - lastRefresh > 2000) {
-          const bidsResponse = await fetch(`/api/bids?t=${Date.now()}`);
-          if (bidsResponse.ok) {
-            const bidsData = await bidsResponse.json();
-            setBids(bidsData);
-            setLastRefresh(Date.now());
-          }
-        }
-      } catch (error) {
-        console.error('Error refreshing bids:', error);
+    return () => {
+      clearInterval(refreshInterval);
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
       }
     };
-    
-    // Set up a refresh interval
-    const refreshInterval = setInterval(refreshBids, 5000);
-    
-    return () => clearInterval(refreshInterval);
-  }, [lastRefresh]);
+  }, [fetchBids, fetchAuctionSettings]);
 
-  // Set auction end time from API or default to 3 days from now
+  // Set auction end time and countdown timer
   useEffect(() => {
-    const fetchEndTime = async () => {
+    const setupAuctionTimer = async () => {
       try {
-        const response = await fetch('/api/auction');
-        if (!response.ok) {
-          throw new Error('Failed to fetch auction settings');
-        }
-        const data = await response.json();
+        // Get auction settings
+        const settingsData = await fetchAuctionSettings(true);
         
         let endTime;
-        if (data.endTime) {
-          endTime = new Date(data.endTime);
+        if (settingsData && settingsData.endTime) {
+          endTime = new Date(settingsData.endTime);
         } else {
           // Default to 3 days from now if not set
           endTime = new Date();
@@ -174,28 +213,12 @@ export default function Home() {
         
         return () => clearInterval(interval);
       } catch (error) {
-        console.error('Error fetching end time:', error);
-        
-        // Fallback to localStorage if API fails
-        const storedEndTime = localStorage.getItem('auctionEndTime');
-        let endTime;
-        
-        if (storedEndTime) {
-          endTime = new Date(parseInt(storedEndTime));
-        } else {
-          // Default to 3 days from now if not set
-          endTime = new Date();
-          endTime.setDate(endTime.getDate() + 3);
-          localStorage.setItem('auctionEndTime', endTime.getTime().toString());
-        }
-        
-        // Rest of the timer logic...
-        // (Same as above)
+        console.error('Error setting up auction timer:', error);
       }
     };
     
-    fetchEndTime();
-  }, [bids]);
+    setupAuctionTimer();
+  }, [fetchAuctionSettings, bids]);
 
   const handleBid = async (username, amount) => {
     if (isAuctionEnded) return;
@@ -221,25 +244,21 @@ export default function Home() {
       
       const addedBid = await response.json();
       
-      // Update local state
+      // Update local state immediately
       setBids(prevBids => [...prevBids, addedBid]);
-      setLastRefresh(Date.now());
+      lastBidCountRef.current = bids.length + 1;
       
       // Fallback: also save to localStorage
       localStorage.setItem('windowAuctionBids', JSON.stringify([...bids, addedBid]));
       
-      // Refresh bids from server to ensure we have the latest data
-      setTimeout(async () => {
-        try {
-          const refreshResponse = await fetch(`/api/bids?t=${Date.now()}`);
-          if (refreshResponse.ok) {
-            const refreshedBids = await refreshResponse.json();
-            setBids(refreshedBids);
-          }
-        } catch (error) {
-          console.error('Error refreshing bids after adding:', error);
-        }
-      }, 1000);
+      // Schedule a refresh after a short delay to ensure we have the latest data
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+      }
+      
+      refreshTimeoutRef.current = setTimeout(() => {
+        fetchBids(true);
+      }, 2000);
     } catch (error) {
       console.error('Error adding bid:', error);
       
@@ -276,7 +295,7 @@ export default function Home() {
     }
   };
 
-  if (isLoading) {
+  if (isLoading && bids.length === 0) {
     return (
       <div className={styles.loadingContainer}>
         <div className={styles.loadingSpinner}></div>
@@ -285,7 +304,7 @@ export default function Home() {
     );
   }
 
-  if (error) {
+  if (error && bids.length === 0) {
     return (
       <div className={styles.errorContainer}>
         <h2>Error Loading Auction</h2>

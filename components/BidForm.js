@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { motion } from 'framer-motion';
 import styles from './BidForm.module.css';
 
-export default function BidForm({ onBid, isAuctionEnded }) {
+// Memoize the BidForm component to prevent unnecessary re-renders
+const BidForm = memo(function BidForm({ onBid, isAuctionEnded }) {
   const [username, setUsername] = useState('');
   const [amount, setAmount] = useState('');
   const [error, setError] = useState('');
@@ -19,8 +20,10 @@ export default function BidForm({ onBid, isAuctionEnded }) {
       return;
     }
     
+    let finalUsername = username;
     if (!username.startsWith('@')) {
-      setUsername('@' + username);
+      finalUsername = '@' + username;
+      setUsername(finalUsername);
     }
     
     if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
@@ -33,7 +36,7 @@ export default function BidForm({ onBid, isAuctionEnded }) {
     
     // Simulate submission delay
     setTimeout(() => {
-      onBid(username, amount);
+      onBid(finalUsername, amount);
       setIsSubmitting(false);
       setUsername('');
       setAmount('');
@@ -45,7 +48,9 @@ export default function BidForm({ onBid, isAuctionEnded }) {
       document.body.appendChild(successElement);
       
       setTimeout(() => {
-        document.body.removeChild(successElement);
+        if (document.body.contains(successElement)) {
+          document.body.removeChild(successElement);
+        }
       }, 2000);
     }, 800);
   };
@@ -120,4 +125,6 @@ export default function BidForm({ onBid, isAuctionEnded }) {
       </div>
     </motion.div>
   );
-} 
+});
+
+export default BidForm; 
