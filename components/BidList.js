@@ -29,6 +29,13 @@ export default function BidList({ bids }) {
            ' ' + date.toLocaleDateString();
   };
 
+  // Function to create Twitter profile URL from username
+  const getTwitterProfileUrl = (username) => {
+    // Remove @ if it exists at the beginning
+    const cleanUsername = username.startsWith('@') ? username.substring(1) : username;
+    return `https://twitter.com/${cleanUsername}`;
+  };
+
   const sortedBids = getSortedBids();
   const highestBid = bids.length > 0 
     ? bids.reduce((max, bid) => bid.amount > max.amount ? bid : max, bids[0])
@@ -40,7 +47,15 @@ export default function BidList({ bids }) {
         <h2 className={styles.bidListTitle}>Current Bids</h2>
         {highestBid && (
           <div className={styles.highestBid}>
-            Highest Bid: <span>${highestBid.amount.toFixed(2)}</span> by {highestBid.username}
+            Highest Bid: <span>${highestBid.amount.toFixed(2)}</span> by{' '}
+            <a 
+              href={getTwitterProfileUrl(highestBid.username)} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className={styles.usernameLink}
+            >
+              {highestBid.username}
+            </a>
           </div>
         )}
       </div>
@@ -78,7 +93,16 @@ export default function BidList({ bids }) {
                 whileHover={{ scale: 1.02 }}
               >
                 <div className={styles.bidInfo}>
-                  <div className={styles.bidUser}>{bid.username}</div>
+                  <div className={styles.bidUser}>
+                    <a 
+                      href={getTwitterProfileUrl(bid.username)} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={styles.usernameLink}
+                    >
+                      {bid.username}
+                    </a>
+                  </div>
                   <div className={styles.bidAmount}>${bid.amount.toFixed(2)}</div>
                 </div>
                 <div className={styles.bidTime}>{formatTime(bid.timestamp)}</div>

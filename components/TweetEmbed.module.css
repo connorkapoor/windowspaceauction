@@ -94,8 +94,8 @@
 }
 
 /* Hide loading once tweet is loaded */
-:global(.twitter-tweet),
-:global(.twitter-tweet-rendered) {
+.tweetContent :global(.twitter-tweet),
+.tweetContent :global(.twitter-tweet-rendered) {
   z-index: 2;
   position: relative;
 } 

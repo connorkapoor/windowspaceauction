@@ -81,6 +81,17 @@
   margin-bottom: 0.5rem;
 }
 
+.usernameLink {
+  color: #1DA1F2;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.usernameLink:hover {
+  color: #0c85d0;
+  text-decoration: underline;
+}
+
 .winnerBid {
   font-size: 2.2rem;
   font-weight: bold;

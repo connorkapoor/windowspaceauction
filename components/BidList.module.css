@@ -112,6 +112,17 @@
   color: #073b4c;
 }
 
+.usernameLink {
+  color: #1DA1F2;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.usernameLink:hover {
+  color: #0c85d0;
+  text-decoration: underline;
+}
+
 .bidAmount {
   font-weight: bold;
   color: #06d6a0;

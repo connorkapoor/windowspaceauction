@@ -119,6 +119,29 @@ export default function Home() {
       <div className={styles.adminLink}>
         <Link href="/admin">Admin Panel</Link>
       </div>
+      
+      <footer className={styles.footer}>
+        <p>
+          vibe coded by{' '}
+          <a 
+            href="https://twitter.com/connor_kapoor" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={styles.footerLink}
+          >
+            @connor_kapoor
+          </a>{' '}
+          from{' '}
+          <a 
+            href="https://digicastmetal.com" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={styles.footerLink}
+          >
+            digicastmetal.com
+          </a>
+        </p>
+      </footer>
     </main>
   );
 } 

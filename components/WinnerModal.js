@@ -37,6 +37,13 @@ export default function WinnerModal({ winner, onClose }) {
   // Generate Venmo link with pre-filled amount
   const venmoLink = `https://venmo.com/?txn=pay&audience=private&recipients=windowowner&amount=${winner.amount}&note=Window%20Space%20Auction%20Payment`;
 
+  // Function to create Twitter profile URL from username
+  const getTwitterProfileUrl = (username) => {
+    // Remove @ if it exists at the beginning
+    const cleanUsername = username.startsWith('@') ? username.substring(1) : username;
+    return `https://twitter.com/${cleanUsername}`;
+  };
+
   return (
     <div className={styles.modalOverlay}>
       <canvas id="confetti-canvas" className={styles.confettiCanvas}></canvas>
@@ -52,7 +59,16 @@ export default function WinnerModal({ winner, onClose }) {
         <div className={styles.winnerInfo}>
           <div className={styles.trophy}>🏆</div>
           <div className={styles.winnerDetails}>
-            <p className={styles.winnerName}>{winner.username}</p>
+            <p className={styles.winnerName}>
+              <a 
+                href={getTwitterProfileUrl(winner.username)} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className={styles.usernameLink}
+              >
+                {winner.username}
+              </a>
+            </p>
             <p className={styles.winnerBid}>${winner.amount.toFixed(2)}</p>
           </div>
         </div>
