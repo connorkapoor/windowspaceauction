@@ -10,6 +10,8 @@
 .tweetContent {
   width: 100%;
   min-height: 300px;
+  z-index: 1;
+  position: relative;
 }
 
 .loadingContainer {
@@ -23,7 +25,8 @@
   justify-content: center;
   align-items: center;
   background-color: rgba(255, 255, 255, 0.9);
-  z-index: 1;
+  z-index: 3;
+  pointer-events: none;
 }
 
 .loadingSpinner {
@@ -58,7 +61,7 @@
   background-color: #f8f9fa;
   border: 2px dashed #ccc;
   border-radius: 10px;
-  z-index: 2;
+  z-index: 4;
 }
 
 .errorContainer p {
@@ -91,7 +94,8 @@
 }
 
 /* Hide loading once tweet is loaded */
-:global(.twitter-tweet) ~ .loadingContainer,
-:global(.twitter-tweet-rendered) ~ .loadingContainer {
-  display: none !important;
+:global(.twitter-tweet),
+:global(.twitter-tweet-rendered) {
+  z-index: 2;
+  position: relative;
 } 

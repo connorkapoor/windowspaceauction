@@ -7,23 +7,63 @@ export default function TweetEmbed({ tweetUrl }) {
   const tweetContainerRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
+  const loadAttemptedRef = useRef(false);
+  const observerRef = useRef(null);
 
   useEffect(() => {
+    // Reset state when the URL changes
+    setIsLoading(true);
+    setLoadError(false);
+    loadAttemptedRef.current = false;
+    
     // Clean up any existing Twitter widgets
     if (window.twttr && tweetContainerRef.current) {
       // Safer cleanup - just empty the innerHTML instead of removing children
       tweetContainerRef.current.innerHTML = '';
     }
-    
-    setIsLoading(true);
-    setLoadError(false);
 
+    // Prevent multiple load attempts
+    if (loadAttemptedRef.current) return;
+    loadAttemptedRef.current = true;
+    
     // Set a timeout to detect if tweet doesn't load
     const timeoutId = setTimeout(() => {
-      if (isLoading) {
-        setLoadError(true);
-      }
+      setLoadError(true);
+      setIsLoading(false);
     }, 10000); // 10 seconds timeout
+
+    // Set up a MutationObserver to detect when the tweet is loaded
+    if (tweetContainerRef.current) {
+      // Disconnect any existing observer
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      
+      // Create a new observer
+      observerRef.current = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+            // Check if the tweet iframe has been added
+            const tweetExists = tweetContainerRef.current.querySelector('iframe') || 
+                               tweetContainerRef.current.querySelector('.twitter-tweet-rendered') ||
+                               tweetContainerRef.current.querySelector('.twitter-tweet');
+            
+            if (tweetExists) {
+              setIsLoading(false);
+              clearTimeout(timeoutId);
+              observerRef.current.disconnect();
+              break;
+            }
+          }
+        }
+      });
+      
+      // Start observing
+      observerRef.current.observe(tweetContainerRef.current, {
+        childList: true,
+        subtree: true
+      });
+    }
 
     // Load Twitter widget script if it's not already loaded
     if (!window.twttr) {
@@ -49,6 +89,8 @@ export default function TweetEmbed({ tweetUrl }) {
 
     function renderTweet() {
       try {
+        if (!tweetContainerRef.current) return;
+        
         window.twttr.widgets.createTweet(
           extractTweetId(tweetUrl),
           tweetContainerRef.current,
@@ -80,6 +122,11 @@ export default function TweetEmbed({ tweetUrl }) {
       // Clean up
       clearTimeout(timeoutId);
       
+      // Disconnect observer
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      
       // Safer cleanup approach
       if (tweetContainerRef.current) {
         try {
@@ -90,7 +137,7 @@ export default function TweetEmbed({ tweetUrl }) {
         }
       }
     };
-  }, [tweetUrl, isLoading]);
+  }, [tweetUrl]); // Only re-run when tweetUrl changes
 
   // Extract tweet ID from URL
   const extractTweetId = (url) => {
