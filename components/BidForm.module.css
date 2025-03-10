@@ -1,0 +1,161 @@
+.formContainer {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border: 3px dashed #06d6a0;
+}
+
+.formTitle {
+  font-size: 1.8rem;
+  color: #ef476f;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-shadow: 1px 1px 0 #ffd166;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-weight: bold;
+  color: #073b4c;
+  font-size: 1.1rem;
+}
+
+.input {
+  padding: 0.8rem;
+  border: 2px solid #118ab2;
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #ef476f;
+  box-shadow: 0 0 0 3px rgba(239, 71, 111, 0.3);
+  transform: scale(1.02);
+}
+
+.submitButton {
+  background-color: #06d6a0;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  box-shadow: 0 4px 0 #073b4c;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.submitButton:hover {
+  background-color: #05c091;
+}
+
+.submitButton:active {
+  box-shadow: 0 2px 0 #073b4c;
+  transform: translateY(2px);
+}
+
+.submitButton:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.error {
+  background-color: #ffccd5;
+  color: #ef476f;
+  padding: 0.8rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  border-left: 4px solid #ef476f;
+}
+
+.bidTips {
+  margin-top: 1.5rem;
+  background-color: #ffd166;
+  padding: 1rem;
+  border-radius: 10px;
+}
+
+.bidTips h3 {
+  color: #073b4c;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.bidTips ul {
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.bidTips li {
+  margin-bottom: 0.5rem;
+  color: #073b4c;
+}
+
+.successAnimation {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #06d6a0;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  animation: flyUp 2s forwards;
+  z-index: 1000;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.auctionEnded {
+  background-color: #ffd166;
+  padding: 1.5rem;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.auctionEnded h2 {
+  color: #ef476f;
+  margin-top: 0;
+}
+
+@keyframes flyUp {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 50px);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -100px);
+  }
+} 

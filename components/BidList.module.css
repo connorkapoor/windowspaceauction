@@ -1,0 +1,159 @@
+.bidListContainer {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  border: 3px dashed #118ab2;
+}
+
+.bidListHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.bidListTitle {
+  font-size: 1.8rem;
+  color: #118ab2;
+  margin: 0;
+  text-shadow: 1px 1px 0 #ffd166;
+}
+
+.highestBid {
+  background-color: #ffd166;
+  padding: 0.8rem;
+  border-radius: 10px;
+  font-weight: bold;
+  color: #073b4c;
+  display: inline-block;
+}
+
+.highestBid span {
+  color: #ef476f;
+  font-size: 1.2rem;
+}
+
+.sortControls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.sortControls label {
+  font-weight: bold;
+  color: #073b4c;
+}
+
+.sortSelect {
+  padding: 0.5rem;
+  border: 2px solid #118ab2;
+  border-radius: 8px;
+  background-color: white;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+.bidList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: #118ab2 #f0f0f0;
+}
+
+/* Custom scrollbar for Webkit browsers */
+.bidList::-webkit-scrollbar {
+  width: 8px;
+}
+
+.bidList::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 10px;
+}
+
+.bidList::-webkit-scrollbar-thumb {
+  background-color: #118ab2;
+  border-radius: 10px;
+  border: 2px solid #f0f0f0;
+}
+
+.bidList::-webkit-scrollbar-thumb:hover {
+  background-color: #0a6a8a;
+}
+
+.bidItem {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  position: relative;
+  border-left: 4px solid #118ab2;
+}
+
+.highestBidItem {
+  background-color: #fffaeb;
+  border-left: 4px solid #ef476f;
+}
+
+.bidInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bidUser {
+  font-weight: bold;
+  color: #073b4c;
+}
+
+.bidAmount {
+  font-weight: bold;
+  color: #06d6a0;
+  font-size: 1.2rem;
+}
+
+.bidTime {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.leadingBadge {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: #ef476f;
+  color: white;
+  padding: 0.3rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  animation: pulse 2s infinite;
+}
+
+.noBids {
+  text-align: center;
+  padding: 2rem;
+  color: #6c757d;
+  font-style: italic;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+} 

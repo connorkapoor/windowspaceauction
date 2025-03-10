@@ -1,0 +1,47 @@
+:root {
+  --primary-color: #ff6b6b;
+  --secondary-color: #ffd166;
+  --accent-color: #118ab2;
+  --text-color: #073b4c;
+  --background-color: #f5f7fa;
+  --success-color: #06d6a0;
+  --error-color: #ef476f;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+
+body {
+  color: var(--text-color);
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+input, select {
+  font-family: inherit;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+} 

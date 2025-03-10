@@ -1,0 +1,164 @@
+.adminContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.adminCard {
+  background-color: white;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  width: 100%;
+  max-width: 600px;
+  border: 5px solid #118ab2;
+}
+
+.adminTitle {
+  font-size: 2.5rem;
+  color: #118ab2;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-shadow: 2px 2px 0 #ffd166;
+}
+
+.loginForm, .adminPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.loginForm h2, .adminPanel h2 {
+  font-size: 1.8rem;
+  color: #073b4c;
+  margin-bottom: 0.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-weight: bold;
+  color: #073b4c;
+}
+
+.input {
+  padding: 0.8rem;
+  border: 2px solid #118ab2;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.loginButton, .updateButton {
+  background-color: #118ab2;
+  color: white;
+  padding: 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.loginButton:hover, .updateButton:hover {
+  background-color: #0a6a8a;
+  transform: translateY(-2px);
+}
+
+.welcomeMessage {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.logoutButton {
+  background-color: #ef476f;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logoutButton:hover {
+  background-color: #d13b5d;
+}
+
+.errorMessage {
+  background-color: #ffccd5;
+  color: #ef476f;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  border-left: 4px solid #ef476f;
+}
+
+.successMessage {
+  background-color: #d1f5ea;
+  color: #06d6a0;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  border-left: 4px solid #06d6a0;
+}
+
+.auctionSettings {
+  background-color: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 10px;
+  margin-top: 1rem;
+}
+
+.auctionSettings h3 {
+  color: #118ab2;
+  margin-bottom: 1rem;
+  font-size: 1.3rem;
+}
+
+.currentTime {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #fffaeb;
+  border-radius: 8px;
+  border-left: 4px solid #ffd166;
+}
+
+.timeDisplay {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #073b4c;
+  margin-top: 0.5rem;
+}
+
+.endTimeForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.backLink {
+  display: block;
+  text-align: center;
+  margin-top: 2rem;
+  color: #118ab2;
+  font-weight: bold;
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.backLink:hover {
+  color: #0a6a8a;
+} 
