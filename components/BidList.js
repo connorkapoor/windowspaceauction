@@ -1,11 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './BidList.module.css';
 
 export default function BidList({ bids }) {
   const [sortBy, setSortBy] = useState('time-desc');
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastBidCount, setLastBidCount] = useState(0);
+  
+  // Show loading indicator briefly when new bids are added
+  useEffect(() => {
+    if (bids.length > lastBidCount) {
+      setIsLoading(true);
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+    
+    setLastBidCount(bids.length);
+  }, [bids.length, lastBidCount]);
   
   const getSortedBids = () => {
     return [...bids].sort((a, b) => {
@@ -74,6 +90,13 @@ export default function BidList({ bids }) {
           <option value="amount-asc">Lowest Amount</option>
         </select>
       </div>
+      
+      {isLoading && (
+        <div className={styles.bidListLoading}>
+          <div className={styles.loadingSpinner}></div>
+          <p>Updating bids...</p>
+        </div>
+      )}
       
       {bids.length === 0 ? (
         <div className={styles.noBids}>
