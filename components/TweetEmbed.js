@@ -11,6 +11,7 @@ export default function TweetEmbed({ tweetUrl }) {
   useEffect(() => {
     // Clean up any existing Twitter widgets
     if (window.twttr && tweetContainerRef.current) {
+      // Safer cleanup - just empty the innerHTML instead of removing children
       tweetContainerRef.current.innerHTML = '';
     }
     
@@ -47,44 +48,65 @@ export default function TweetEmbed({ tweetUrl }) {
     }
 
     function renderTweet() {
-      window.twttr.widgets.createTweet(
-        extractTweetId(tweetUrl),
-        tweetContainerRef.current,
-        {
-          theme: 'light',
-          dnt: true,
-          width: '100%',
-        }
-      ).then(el => {
-        setIsLoading(false);
-        clearTimeout(timeoutId);
-        if (!el) {
+      try {
+        window.twttr.widgets.createTweet(
+          extractTweetId(tweetUrl),
+          tweetContainerRef.current,
+          {
+            theme: 'light',
+            dnt: true,
+            width: '100%',
+          }
+        ).then(el => {
+          setIsLoading(false);
+          clearTimeout(timeoutId);
+          if (!el) {
+            setLoadError(true);
+          }
+        }).catch(() => {
           setLoadError(true);
-        }
-      }).catch(() => {
+          setIsLoading(false);
+          clearTimeout(timeoutId);
+        });
+      } catch (error) {
+        console.error("Error rendering tweet:", error);
         setLoadError(true);
         setIsLoading(false);
         clearTimeout(timeoutId);
-      });
+      }
     }
 
     return () => {
       // Clean up
       clearTimeout(timeoutId);
+      
+      // Safer cleanup approach
       if (tweetContainerRef.current) {
-        tweetContainerRef.current.innerHTML = '';
+        try {
+          // Just empty the container instead of removing children
+          tweetContainerRef.current.innerHTML = '';
+        } catch (error) {
+          console.error("Error during cleanup:", error);
+        }
       }
     };
   }, [tweetUrl, isLoading]);
 
   // Extract tweet ID from URL
   const extractTweetId = (url) => {
-    const parts = url.split('/');
-    return parts[parts.length - 1];
+    try {
+      const parts = url.split('/');
+      return parts[parts.length - 1];
+    } catch (error) {
+      console.error("Error extracting tweet ID:", error);
+      return '';
+    }
   };
 
   return (
-    <div className={styles.tweetContainer} ref={tweetContainerRef}>
+    <div className={styles.tweetContainer}>
+      <div ref={tweetContainerRef} className={styles.tweetContent}></div>
+      
       {isLoading && !loadError && (
         <div className={styles.loadingContainer}>
           <div className={styles.loadingSpinner}></div>
