@@ -322,6 +322,9 @@ export default function Home() {
             digicastmetal.com
           </a>
         </p>
+        <p className={styles.fontNotice}>
+          Comic Sans MS font provided by OnlineWebFonts.com
+        </p>
       </footer>
     </main>
   );

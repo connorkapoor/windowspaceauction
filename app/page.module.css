@@ -222,4 +222,10 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.fontNotice {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  margin-top: 0.5rem;
 } 

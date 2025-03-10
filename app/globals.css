@@ -1,3 +1,14 @@
+@font-face {
+  font-family: 'Comic Sans MS';
+  src: local('Comic Sans MS'),
+       local('ComicSansMS'),
+       url('https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.woff2') format('woff2'),
+       url('https://db.onlinewebfonts.com/t/7cc6719bd5f0310be3150ba33418e72e.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --primary-color: #ff6b6b;
   --secondary-color: #ffd166;
@@ -6,7 +17,7 @@
   --background-color: #f5f7fa;
   --success-color: #06d6a0;
   --error-color: #ef476f;
-  --font-family: 'Comic Sans MS', 'Comic Sans', cursive, sans-serif;
+  --font-family: 'Comic Sans MS', 'Comic Sans', 'Chalkboard SE', 'Comic Neue', cursive, sans-serif;
 }
 
 * {
@@ -47,6 +58,11 @@ input, select {
 @media (max-width: 768px) {
   html, body {
     font-size: 16px; /* Ensure readable font size on mobile */
+    font-family: var(--font-family) !important; /* Force font family on mobile */
+  }
+  
+  input, button, select, textarea {
+    font-family: var(--font-family) !important; /* Force font family on form elements */
   }
 }
 
