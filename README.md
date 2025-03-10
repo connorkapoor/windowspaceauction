@@ -10,6 +10,7 @@ A fun, interactive web application for auctioning off window space. Users can pl
 - Animated winner announcement with confetti
 - Responsive design for all devices
 - Admin panel to manage auction end time
+- Persistent bids across all users with Vercel Blob
 
 ## Technologies Used
 
@@ -19,6 +20,7 @@ A fun, interactive web application for auctioning off window space. Users can pl
 - CSS Modules for styling
 - Confetti-JS for winner celebration
 - Twitter (X) embed API
+- Vercel Blob for data persistence
 
 ## Getting Started
 
@@ -29,13 +31,43 @@ A fun, interactive web application for auctioning off window space. Users can pl
    # or
    yarn install
    ```
-3. Run the development server:
+3. Set up environment variables:
+   - Create a `.env.local` file in the root directory
+   - Add your Vercel Blob token: `BLOB_READ_WRITE_TOKEN="your_token_here"`
+4. Run the development server:
    ```bash
    npm run dev
    # or
    yarn dev
    ```
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## Setting Up Vercel Blob
+
+For persistent data storage across all users, you need to set up Vercel Blob:
+
+1. Install the Vercel CLI:
+   ```bash
+   npm i -g vercel
+   ```
+
+2. Link your project to Vercel:
+   ```bash
+   vercel link
+   ```
+
+3. Create a new Vercel Blob store:
+   ```bash
+   vercel blob create
+   ```
+
+4. Add the Blob token to your environment variables:
+   ```bash
+   # In .env.local
+   BLOB_READ_WRITE_TOKEN="your_blob_token_here"
+   ```
+
+5. When deploying to Vercel, add the Blob token as an environment variable in the Vercel dashboard
 
 ## How It Works
 
@@ -44,6 +76,7 @@ A fun, interactive web application for auctioning off window space. Users can pl
 - The highest bidder at the end of the auction wins
 - The winner is prompted to complete payment via Venmo
 - Admins can change the auction end time through the admin panel
+- All bids are stored in Vercel Blob and shared across all users
 
 ## Admin Access
 
@@ -51,7 +84,7 @@ A fun, interactive web application for auctioning off window space. Users can pl
 2. Login with:
    - Username: `admin`
    - Password: `windowspace`
-3. Once logged in, you can view and update the auction end time
+3. Once logged in, you can view and update the auction end time, clear bids, or reset the entire auction
 
 ## Deploying to Vercel
 
@@ -72,7 +105,11 @@ This project is ready to be deployed on Vercel. Follow these steps:
    - Sign in with GitHub
    - Click "Add New..." and select "Project"
    - Select your repository
-   - Keep the default settings and click "Deploy"
+   - In the "Environment Variables" section, add your Vercel Blob token:
+     ```
+     BLOB_READ_WRITE_TOKEN=your_blob_token_here
+     ```
+   - Click "Deploy"
 
 3. Your site will be deployed and available at a Vercel URL
 

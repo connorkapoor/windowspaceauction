@@ -1,10 +1,8 @@
+import { getBids, addBid } from '../../../lib/db';
+
 export async function GET() {
   try {
-    // For now, we'll use a simple file-based approach that works on Vercel
-    // In a production app, you would use a database like Vercel KV, MongoDB, etc.
-    
-    // Return the bids from our "database"
-    const bids = global.bids || [];
+    const bids = await getBids();
     
     return new Response(JSON.stringify(bids), {
       headers: { 'Content-Type': 'application/json' },
@@ -30,20 +28,8 @@ export async function POST(request) {
       });
     }
     
-    // Initialize global bids array if it doesn't exist
-    if (!global.bids) {
-      global.bids = [];
-    }
-    
     // Add the new bid
-    const newBid = {
-      id: Date.now(),
-      username: bid.username,
-      amount: parseFloat(bid.amount),
-      timestamp: new Date().toISOString()
-    };
-    
-    global.bids.push(newBid);
+    const newBid = await addBid(bid);
     
     return new Response(JSON.stringify(newBid), {
       headers: { 'Content-Type': 'application/json' },

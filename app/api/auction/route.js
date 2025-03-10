@@ -1,12 +1,8 @@
+import { getAuctionSettings, updateAuctionSettings } from '../../../lib/db';
+
 export async function GET() {
   try {
-    // Return the auction settings
-    const settings = {
-      endTime: global.auctionEndTime || getDefaultEndTime(),
-      isEnded: global.isAuctionEnded || false,
-      winningBid: global.winningBid || null,
-      showWinner: global.showWinner || false
-    };
+    const settings = await getAuctionSettings();
     
     return new Response(JSON.stringify(settings), {
       headers: { 'Content-Type': 'application/json' },
@@ -23,31 +19,7 @@ export async function GET() {
 export async function POST(request) {
   try {
     const settings = await request.json();
-    
-    // Update auction settings
-    if (settings.endTime) {
-      global.auctionEndTime = settings.endTime;
-    }
-    
-    if (settings.isEnded !== undefined) {
-      global.isAuctionEnded = settings.isEnded;
-    }
-    
-    if (settings.winningBid) {
-      global.winningBid = settings.winningBid;
-    }
-    
-    if (settings.showWinner !== undefined) {
-      global.showWinner = settings.showWinner;
-    }
-    
-    // Return the updated settings
-    const updatedSettings = {
-      endTime: global.auctionEndTime || getDefaultEndTime(),
-      isEnded: global.isAuctionEnded || false,
-      winningBid: global.winningBid || null,
-      showWinner: global.showWinner || false
-    };
+    const updatedSettings = await updateAuctionSettings(settings);
     
     return new Response(JSON.stringify(updatedSettings), {
       headers: { 'Content-Type': 'application/json' },

@@ -1,3 +1,5 @@
+import { clearBids, resetAuction, updateAuctionSettings } from '../../../lib/db';
+
 export async function POST(request) {
   try {
     const { action, password } = await request.json();
@@ -14,7 +16,7 @@ export async function POST(request) {
     switch (action) {
       case 'clearBids':
         // Clear all bids
-        global.bids = [];
+        await clearBids();
         return new Response(JSON.stringify({ success: true, message: 'All bids cleared' }), {
           headers: { 'Content-Type': 'application/json' },
           status: 200
@@ -22,20 +24,12 @@ export async function POST(request) {
         
       case 'resetAuction':
         // Reset the entire auction
-        global.bids = [];
-        global.winningBid = null;
-        global.showWinner = false;
-        global.isAuctionEnded = false;
-        
-        // Set new end time (3 days from now)
-        const newEndTime = new Date();
-        newEndTime.setDate(newEndTime.getDate() + 3);
-        global.auctionEndTime = newEndTime.toISOString();
+        const resetSettings = await resetAuction();
         
         return new Response(JSON.stringify({ 
           success: true, 
           message: 'Auction reset',
-          endTime: global.auctionEndTime
+          endTime: resetSettings.endTime
         }), {
           headers: { 'Content-Type': 'application/json' },
           status: 200
@@ -50,12 +44,12 @@ export async function POST(request) {
           });
         }
         
-        global.auctionEndTime = endTime;
+        const updatedSettings = await updateAuctionSettings({ endTime });
         
         return new Response(JSON.stringify({ 
           success: true, 
           message: 'End time updated',
-          endTime: global.auctionEndTime
+          endTime: updatedSettings.endTime
         }), {
           headers: { 'Content-Type': 'application/json' },
           status: 200
