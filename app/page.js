@@ -16,6 +16,41 @@ export default function Home() {
   const [timeLeft, setTimeLeft] = useState(null);
   const [isAuctionEnded, setIsAuctionEnded] = useState(false);
 
+  // Load bids from localStorage on initial render
+  useEffect(() => {
+    const savedBids = localStorage.getItem('windowAuctionBids');
+    if (savedBids) {
+      setBids(JSON.parse(savedBids));
+    }
+    
+    const savedWinningBid = localStorage.getItem('windowAuctionWinningBid');
+    if (savedWinningBid) {
+      setWinningBid(JSON.parse(savedWinningBid));
+      setShowWinner(localStorage.getItem('windowAuctionShowWinner') === 'true');
+    }
+    
+    const savedIsAuctionEnded = localStorage.getItem('windowAuctionIsEnded');
+    if (savedIsAuctionEnded) {
+      setIsAuctionEnded(savedIsAuctionEnded === 'true');
+    }
+  }, []);
+
+  // Save bids to localStorage whenever they change
+  useEffect(() => {
+    if (bids.length > 0) {
+      localStorage.setItem('windowAuctionBids', JSON.stringify(bids));
+    }
+  }, [bids]);
+
+  // Save winning bid and auction state to localStorage
+  useEffect(() => {
+    if (winningBid) {
+      localStorage.setItem('windowAuctionWinningBid', JSON.stringify(winningBid));
+    }
+    localStorage.setItem('windowAuctionShowWinner', showWinner.toString());
+    localStorage.setItem('windowAuctionIsEnded', isAuctionEnded.toString());
+  }, [winningBid, showWinner, isAuctionEnded]);
+
   // Set auction end time from localStorage or default to 3 days from now
   useEffect(() => {
     let endTime;
@@ -28,6 +63,18 @@ export default function Home() {
       endTime = new Date();
       endTime.setDate(endTime.getDate() + 3);
       localStorage.setItem('auctionEndTime', endTime.getTime().toString());
+    }
+    
+    // Check if auction has already ended
+    const now = new Date();
+    if (endTime <= now) {
+      setIsAuctionEnded(true);
+      if (bids.length > 0 && !winningBid) {
+        const winner = [...bids].sort((a, b) => b.amount - a.amount)[0];
+        setWinningBid(winner);
+        setShowWinner(true);
+      }
+      return;
     }
     
     const interval = setInterval(() => {
@@ -56,7 +103,7 @@ export default function Home() {
     }, 1000);
     
     return () => clearInterval(interval);
-  }, [bids]);
+  }, [bids, winningBid]);
 
   const handleBid = (username, amount) => {
     if (isAuctionEnded) return;
@@ -69,6 +116,11 @@ export default function Home() {
     };
     
     setBids(prevBids => [...prevBids, newBid]);
+  };
+
+  const handleCloseWinner = () => {
+    setShowWinner(false);
+    localStorage.setItem('windowAuctionShowWinner', 'false');
   };
 
   return (
@@ -112,7 +164,7 @@ export default function Home() {
       {showWinner && (
         <WinnerModal 
           winner={winningBid} 
-          onClose={() => setShowWinner(false)} 
+          onClose={handleCloseWinner} 
         />
       )}
       

@@ -13,6 +13,7 @@ export default function AdminPage() {
   const [currentEndTime, setCurrentEndTime] = useState(null);
   const [newEndTime, setNewEndTime] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [bidCount, setBidCount] = useState(0);
   const router = useRouter();
 
   // Check if user is already logged in
@@ -21,8 +22,17 @@ export default function AdminPage() {
     if (adminToken) {
       setIsLoggedIn(true);
       loadCurrentEndTime();
+      loadBidCount();
     }
   }, []);
+
+  const loadBidCount = () => {
+    const savedBids = localStorage.getItem('windowAuctionBids');
+    if (savedBids) {
+      const bids = JSON.parse(savedBids);
+      setBidCount(bids.length);
+    }
+  };
 
   const loadCurrentEndTime = () => {
     const storedEndTime = localStorage.getItem('auctionEndTime');
@@ -64,6 +74,7 @@ export default function AdminPage() {
       setIsLoggedIn(true);
       setLoginError('');
       loadCurrentEndTime();
+      loadBidCount();
     } else {
       setLoginError('Invalid username or password');
     }
@@ -99,6 +110,58 @@ export default function AdminPage() {
     setTimeout(() => {
       setSuccessMessage('');
     }, 3000);
+  };
+
+  const handleClearBids = () => {
+    if (window.confirm('Are you sure you want to clear all bids? This action cannot be undone.')) {
+      // Clear all bid-related data from localStorage
+      localStorage.removeItem('windowAuctionBids');
+      localStorage.removeItem('windowAuctionWinningBid');
+      localStorage.setItem('windowAuctionShowWinner', 'false');
+      
+      setBidCount(0);
+      setSuccessMessage('All bids have been cleared successfully!');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+    }
+  };
+
+  const handleResetAuction = () => {
+    if (window.confirm('Are you sure you want to reset the entire auction? This will clear all bids and reset the end time. This action cannot be undone.')) {
+      // Clear all auction data from localStorage
+      localStorage.removeItem('windowAuctionBids');
+      localStorage.removeItem('windowAuctionWinningBid');
+      localStorage.setItem('windowAuctionShowWinner', 'false');
+      localStorage.setItem('windowAuctionIsEnded', 'false');
+      
+      // Set new end time (3 days from now)
+      const newEndTime = new Date();
+      newEndTime.setDate(newEndTime.getDate() + 3);
+      localStorage.setItem('auctionEndTime', newEndTime.getTime().toString());
+      
+      // Update state
+      setCurrentEndTime(newEndTime);
+      setBidCount(0);
+      
+      // Format for datetime-local input
+      const year = newEndTime.getFullYear();
+      const month = String(newEndTime.getMonth() + 1).padStart(2, '0');
+      const day = String(newEndTime.getDate()).padStart(2, '0');
+      const hours = String(newEndTime.getHours()).padStart(2, '0');
+      const minutes = String(newEndTime.getMinutes()).padStart(2, '0');
+      
+      setNewEndTime(`${year}-${month}-${day}T${hours}:${minutes}`);
+      
+      setSuccessMessage('Auction has been completely reset!');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => {
+        setSuccessMessage('');
+      }, 3000);
+    }
   };
 
   return (
@@ -181,6 +244,31 @@ export default function AdminPage() {
                   Update End Time
                 </button>
               </form>
+            </div>
+            
+            <div className={styles.bidManagement}>
+              <h3>Bid Management</h3>
+              
+              <div className={styles.bidStats}>
+                <p>Current Bid Count: <span className={styles.bidCount}>{bidCount}</span></p>
+              </div>
+              
+              <div className={styles.bidActions}>
+                <button 
+                  onClick={handleClearBids} 
+                  className={`${styles.actionButton} ${styles.dangerButton}`}
+                  disabled={bidCount === 0}
+                >
+                  Clear All Bids
+                </button>
+                
+                <button 
+                  onClick={handleResetAuction} 
+                  className={`${styles.actionButton} ${styles.dangerButton}`}
+                >
+                  Reset Entire Auction
+                </button>
+              </div>
             </div>
           </div>
         )}
