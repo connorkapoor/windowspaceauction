@@ -2,20 +2,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 2rem;
+  padding: 1rem;
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-family: var(--font-family);
 }
 
 .header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   width: 100%;
 }
 
 .title {
-  font-size: 3rem;
+  font-size: 2.5rem;
   color: #ff6b6b;
   text-shadow: 3px 3px 0 #ffd166;
   margin-bottom: 0.5rem;
@@ -23,7 +23,7 @@
 }
 
 .subtitle {
-  font-size: 1.5rem;
+  font-size: 1.2rem;
   color: #118ab2;
   margin-bottom: 1rem;
 }
@@ -42,14 +42,26 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
   width: 100%;
   max-width: 1200px;
 }
 
 @media (min-width: 768px) {
+  .main {
+    padding: 2rem;
+  }
+  
   .container {
     flex-direction: row;
+  }
+  
+  .title {
+    font-size: 3rem;
+  }
+  
+  .subtitle {
+    font-size: 1.5rem;
   }
 }
 
@@ -60,6 +72,7 @@
   border-radius: 10px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   overflow: hidden;
+  margin-bottom: 1rem;
 }
 
 .windowImage {
@@ -90,6 +103,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  width: 100%;
 }
 
 .adminLink {
@@ -143,5 +157,69 @@
   }
   60% {
     transform: translateY(-10px);
+  }
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: var(--font-family);
+  text-align: center;
+}
+
+.loadingSpinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  border-top-color: #118ab2;
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: var(--font-family);
+  text-align: center;
+}
+
+.errorContainer h2 {
+  color: #ef476f;
+  margin-bottom: 1rem;
+}
+
+.retryButton {
+  background-color: #118ab2;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  font-family: var(--font-family);
+}
+
+.retryButton:hover {
+  background-color: #0a6a8a;
+  transform: translateY(-2px);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 } 

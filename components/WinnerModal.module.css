@@ -34,6 +34,8 @@
   position: relative;
   overflow: hidden;
   border: 5px solid #ffd166;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .modalContent::before {
@@ -63,6 +65,7 @@
   padding: 1rem;
   background-color: #f8f9fa;
   border-radius: 10px;
+  flex-wrap: wrap;
 }
 
 .trophy {
@@ -79,6 +82,7 @@
   font-weight: bold;
   color: #073b4c;
   margin-bottom: 0.5rem;
+  word-break: break-word;
 }
 
 .usernameLink {
@@ -107,7 +111,7 @@
 .venmoButton {
   display: inline-block;
   background-color: #008CFF;
-  color: white;
+  color: white !important;
   font-weight: bold;
   padding: 1rem 2rem;
   border-radius: 30px;
@@ -155,11 +159,48 @@
   font-size: 1rem;
   font-weight: bold;
   transition: all 0.3s ease;
+  font-family: var(--font-family);
 }
 
 .closeButton:hover {
   background-color: #073b4c;
   color: white;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .modalContent {
+    padding: 1.5rem;
+  }
+  
+  .winnerTitle {
+    font-size: 2rem;
+  }
+  
+  .trophy {
+    font-size: 3rem;
+  }
+  
+  .winnerName {
+    font-size: 1.5rem;
+  }
+  
+  .winnerBid {
+    font-size: 1.8rem;
+  }
+  
+  .congratsMessage {
+    font-size: 1rem;
+  }
+  
+  .venmoButton {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .instructions {
+    padding: 1rem;
+  }
 }
 
 @keyframes pulse {

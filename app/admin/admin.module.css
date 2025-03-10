@@ -218,4 +218,15 @@
 .dangerButton:disabled {
   background-color: #f8a5b9;
   cursor: not-allowed;
+}
+
+.loadingMessage {
+  background-color: #e6f7ff;
+  color: #118ab2;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  border-left: 4px solid #118ab2;
+  margin-bottom: 1rem;
+  text-align: center;
 } 

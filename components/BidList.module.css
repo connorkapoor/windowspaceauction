@@ -4,6 +4,7 @@
   border-radius: 15px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   border: 3px dashed #118ab2;
+  width: 100%;
 }
 
 .bidListHeader {
@@ -27,6 +28,7 @@
   font-weight: bold;
   color: #073b4c;
   display: inline-block;
+  word-break: break-word;
 }
 
 .highestBid span {
@@ -39,6 +41,7 @@
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .sortControls label {
@@ -51,7 +54,7 @@
   border: 2px solid #118ab2;
   border-radius: 8px;
   background-color: white;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-family: var(--font-family);
 }
 
 .bidList {
@@ -63,6 +66,7 @@
   padding-right: 0.5rem;
   scrollbar-width: thin;
   scrollbar-color: #118ab2 #f0f0f0;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
 }
 
 /* Custom scrollbar for Webkit browsers */
@@ -94,6 +98,7 @@
   gap: 0.5rem;
   position: relative;
   border-left: 4px solid #118ab2;
+  word-break: break-word;
 }
 
 .highestBidItem {
@@ -105,17 +110,23 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .bidUser {
   font-weight: bold;
   color: #073b4c;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .usernameLink {
   color: #1DA1F2;
   text-decoration: none;
   transition: color 0.2s ease;
+  word-break: break-word;
 }
 
 .usernameLink:hover {
@@ -127,6 +138,7 @@
   font-weight: bold;
   color: #06d6a0;
   font-size: 1.2rem;
+  white-space: nowrap;
 }
 
 .bidTime {
@@ -155,6 +167,30 @@
   font-style: italic;
   background-color: #f8f9fa;
   border-radius: 10px;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .bidListContainer {
+    padding: 1rem;
+  }
+  
+  .bidListTitle {
+    font-size: 1.5rem;
+  }
+  
+  .bidList {
+    max-height: 250px;
+  }
+  
+  .bidInfo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .bidAmount {
+    align-self: flex-end;
+  }
 }
 
 @keyframes pulse {

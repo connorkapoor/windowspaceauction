@@ -4,6 +4,7 @@
   border-radius: 15px;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
   border: 3px dashed #06d6a0;
+  width: 100%;
 }
 
 .formTitle {
@@ -38,7 +39,8 @@
   border-radius: 10px;
   font-size: 1rem;
   transition: all 0.3s ease;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-family: var(--font-family);
+  width: 100%;
 }
 
 .input:focus {
@@ -60,7 +62,8 @@
   transition: all 0.3s ease;
   margin-top: 1rem;
   box-shadow: 0 4px 0 #073b4c;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-family: var(--font-family);
+  width: 100%;
 }
 
 .submitButton:hover {
@@ -86,6 +89,7 @@
   margin-bottom: 1rem;
   font-weight: bold;
   border-left: 4px solid #ef476f;
+  word-break: break-word;
 }
 
 .bidTips {
@@ -125,7 +129,9 @@
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
   animation: flyUp 2s forwards;
   z-index: 1000;
-  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-family: var(--font-family);
+  text-align: center;
+  max-width: 90%;
 }
 
 .auctionEnded {
@@ -139,6 +145,29 @@
 .auctionEnded h2 {
   color: #ef476f;
   margin-top: 0;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .formContainer {
+    padding: 1rem;
+  }
+  
+  .formTitle {
+    font-size: 1.5rem;
+  }
+  
+  .input {
+    font-size: 16px; /* Prevent iOS zoom on focus */
+  }
+  
+  .submitButton {
+    font-size: 1.1rem;
+  }
+  
+  .bidTips {
+    font-size: 0.9rem;
+  }
 }
 
 @keyframes flyUp {

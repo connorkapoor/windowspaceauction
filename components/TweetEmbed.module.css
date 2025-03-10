@@ -93,9 +93,29 @@
   background-color: #0c85d0;
 }
 
-/* Hide loading once tweet is loaded */
+/* Make sure tweet is responsive */
 .tweetContent :global(.twitter-tweet),
 .tweetContent :global(.twitter-tweet-rendered) {
   z-index: 2;
   position: relative;
+  margin: 0 auto !important;
+  max-width: 100% !important;
+}
+
+/* Mobile-specific styles */
+@media (max-width: 768px) {
+  .tweetContainer,
+  .tweetContent {
+    min-height: 250px;
+  }
+  
+  .errorContainer {
+    padding: 1rem;
+    min-height: 250px;
+  }
+  
+  .tweetInfo {
+    max-width: 95%;
+    font-size: 0.9rem;
+  }
 } 

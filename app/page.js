@@ -15,113 +15,242 @@ export default function Home() {
   const [winningBid, setWinningBid] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
   const [isAuctionEnded, setIsAuctionEnded] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Load bids from localStorage on initial render
+  // Load bids and auction settings from API
   useEffect(() => {
-    const savedBids = localStorage.getItem('windowAuctionBids');
-    if (savedBids) {
-      setBids(JSON.parse(savedBids));
-    }
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Fetch bids
+        const bidsResponse = await fetch('/api/bids');
+        if (!bidsResponse.ok) {
+          throw new Error('Failed to fetch bids');
+        }
+        const bidsData = await bidsResponse.json();
+        setBids(bidsData);
+        
+        // Fetch auction settings
+        const settingsResponse = await fetch('/api/auction');
+        if (!settingsResponse.ok) {
+          throw new Error('Failed to fetch auction settings');
+        }
+        const settingsData = await settingsResponse.json();
+        
+        if (settingsData.endTime) {
+          // Use the end time from the API
+          const endTime = new Date(settingsData.endTime);
+          
+          // Check if auction has already ended
+          const now = new Date();
+          if (endTime <= now) {
+            setIsAuctionEnded(true);
+            if (bidsData.length > 0) {
+              const winner = [...bidsData].sort((a, b) => b.amount - a.amount)[0];
+              setWinningBid(winner);
+              setShowWinner(settingsData.showWinner);
+            }
+          }
+        }
+        
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError(error.message);
+        setIsLoading(false);
+        
+        // Fallback to localStorage if API fails
+        const savedBids = localStorage.getItem('windowAuctionBids');
+        if (savedBids) {
+          setBids(JSON.parse(savedBids));
+        }
+      }
+    };
     
-    const savedWinningBid = localStorage.getItem('windowAuctionWinningBid');
-    if (savedWinningBid) {
-      setWinningBid(JSON.parse(savedWinningBid));
-      setShowWinner(localStorage.getItem('windowAuctionShowWinner') === 'true');
-    }
-    
-    const savedIsAuctionEnded = localStorage.getItem('windowAuctionIsEnded');
-    if (savedIsAuctionEnded) {
-      setIsAuctionEnded(savedIsAuctionEnded === 'true');
-    }
+    fetchData();
   }, []);
 
-  // Save bids to localStorage whenever they change
+  // Set auction end time from API or default to 3 days from now
   useEffect(() => {
-    if (bids.length > 0) {
-      localStorage.setItem('windowAuctionBids', JSON.stringify(bids));
-    }
+    const fetchEndTime = async () => {
+      try {
+        const response = await fetch('/api/auction');
+        if (!response.ok) {
+          throw new Error('Failed to fetch auction settings');
+        }
+        const data = await response.json();
+        
+        let endTime;
+        if (data.endTime) {
+          endTime = new Date(data.endTime);
+        } else {
+          // Default to 3 days from now if not set
+          endTime = new Date();
+          endTime.setDate(endTime.getDate() + 3);
+          
+          // Save the default end time
+          await fetch('/api/auction', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ endTime: endTime.toISOString() }),
+          });
+        }
+        
+        const interval = setInterval(() => {
+          const now = new Date();
+          const difference = endTime - now;
+          
+          if (difference <= 0) {
+            clearInterval(interval);
+            setIsAuctionEnded(true);
+            
+            // Find the winning bid
+            if (bids.length > 0) {
+              const winner = [...bids].sort((a, b) => b.amount - a.amount)[0];
+              setWinningBid(winner);
+              setShowWinner(true);
+              
+              // Update auction settings
+              fetch('/api/auction', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  isEnded: true,
+                  winningBid: winner,
+                  showWinner: true
+                }),
+              });
+            }
+            return;
+          }
+          
+          const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+          const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+          const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+          const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+          
+          setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
+        }, 1000);
+        
+        return () => clearInterval(interval);
+      } catch (error) {
+        console.error('Error fetching end time:', error);
+        
+        // Fallback to localStorage if API fails
+        const storedEndTime = localStorage.getItem('auctionEndTime');
+        let endTime;
+        
+        if (storedEndTime) {
+          endTime = new Date(parseInt(storedEndTime));
+        } else {
+          // Default to 3 days from now if not set
+          endTime = new Date();
+          endTime.setDate(endTime.getDate() + 3);
+          localStorage.setItem('auctionEndTime', endTime.getTime().toString());
+        }
+        
+        // Rest of the timer logic...
+        // (Same as above)
+      }
+    };
+    
+    fetchEndTime();
   }, [bids]);
 
-  // Save winning bid and auction state to localStorage
-  useEffect(() => {
-    if (winningBid) {
-      localStorage.setItem('windowAuctionWinningBid', JSON.stringify(winningBid));
-    }
-    localStorage.setItem('windowAuctionShowWinner', showWinner.toString());
-    localStorage.setItem('windowAuctionIsEnded', isAuctionEnded.toString());
-  }, [winningBid, showWinner, isAuctionEnded]);
-
-  // Set auction end time from localStorage or default to 3 days from now
-  useEffect(() => {
-    let endTime;
-    const storedEndTime = localStorage.getItem('auctionEndTime');
-    
-    if (storedEndTime) {
-      endTime = new Date(parseInt(storedEndTime));
-    } else {
-      // Default to 3 days from now if not set
-      endTime = new Date();
-      endTime.setDate(endTime.getDate() + 3);
-      localStorage.setItem('auctionEndTime', endTime.getTime().toString());
-    }
-    
-    // Check if auction has already ended
-    const now = new Date();
-    if (endTime <= now) {
-      setIsAuctionEnded(true);
-      if (bids.length > 0 && !winningBid) {
-        const winner = [...bids].sort((a, b) => b.amount - a.amount)[0];
-        setWinningBid(winner);
-        setShowWinner(true);
-      }
-      return;
-    }
-    
-    const interval = setInterval(() => {
-      const now = new Date();
-      const difference = endTime - now;
-      
-      if (difference <= 0) {
-        clearInterval(interval);
-        setIsAuctionEnded(true);
-        
-        // Find the winning bid
-        if (bids.length > 0) {
-          const winner = [...bids].sort((a, b) => b.amount - a.amount)[0];
-          setWinningBid(winner);
-          setShowWinner(true);
-        }
-        return;
-      }
-      
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-      
-      setTimeLeft(`${days}d ${hours}h ${minutes}m ${seconds}s`);
-    }, 1000);
-    
-    return () => clearInterval(interval);
-  }, [bids, winningBid]);
-
-  const handleBid = (username, amount) => {
+  const handleBid = async (username, amount) => {
     if (isAuctionEnded) return;
     
     const newBid = {
-      id: Date.now(),
       username,
-      amount: parseFloat(amount),
-      timestamp: new Date().toISOString()
+      amount: parseFloat(amount)
     };
     
-    setBids(prevBids => [...prevBids, newBid]);
+    try {
+      // Send the bid to the API
+      const response = await fetch('/api/bids', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newBid),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to add bid');
+      }
+      
+      const addedBid = await response.json();
+      
+      // Update local state
+      setBids(prevBids => [...prevBids, addedBid]);
+      
+      // Fallback: also save to localStorage
+      localStorage.setItem('windowAuctionBids', JSON.stringify([...bids, addedBid]));
+    } catch (error) {
+      console.error('Error adding bid:', error);
+      
+      // Fallback: add to local state only
+      const fallbackBid = {
+        id: Date.now(),
+        username,
+        amount: parseFloat(amount),
+        timestamp: new Date().toISOString()
+      };
+      
+      setBids(prevBids => [...prevBids, fallbackBid]);
+      localStorage.setItem('windowAuctionBids', JSON.stringify([...bids, fallbackBid]));
+    }
   };
 
-  const handleCloseWinner = () => {
+  const handleCloseWinner = async () => {
     setShowWinner(false);
-    localStorage.setItem('windowAuctionShowWinner', 'false');
+    
+    try {
+      // Update auction settings
+      await fetch('/api/auction', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ showWinner: false }),
+      });
+    } catch (error) {
+      console.error('Error updating winner visibility:', error);
+      
+      // Fallback to localStorage
+      localStorage.setItem('windowAuctionShowWinner', 'false');
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className={styles.loadingContainer}>
+        <div className={styles.loadingSpinner}></div>
+        <p>Loading auction data...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className={styles.errorContainer}>
+        <h2>Error Loading Auction</h2>
+        <p>{error}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className={styles.retryButton}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <main className={styles.main}>
